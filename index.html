@@ -6,50 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="description"
         content="Citadel - The privatized Chromium-based enterprise browser that keeps company data inside your walls." />
+    <meta name="theme-color" content="#020617">
     <title>Citadel | The Privatized Enterprise Browser</title>
 
-    <!-- FONTS -->
+    <!-- PERFORMANCE: Preload Critical Assets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&family=JetBrains+Mono:wght@400&display=swap"
         rel="stylesheet">
+    <link rel="modulepreload" href="https://unpkg.com/three@0.160.0/build/three.module.js">
+
+    <!-- IMPORT MAP -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
 
     <style>
         /* 
-         * =========================================
-         *  DESIGN SYSTEM: Ultimate Premium
-         * =========================================
+         * CITADEL DESIGN SYSTEM (Production Build)
          */
         :root {
-            /* Deep Space Base */
-            --color-bg-base: #020617;
-            --color-bg-mesh: radial-gradient(circle at 50% 0%, #172554, transparent 70%);
-
-            --color-text-main: #f8fafc;
-            --color-text-muted: #94a3b8;
-            --color-text-accent: #38bdf8;
-
-            --color-border: rgba(255, 255, 255, 0.08);
-            --color-glass: rgba(2, 6, 23, 0.6);
-            --color-glass-strong: rgba(2, 6, 23, 0.9);
-
-            --color-primary: #3b82f6;
-            --color-primary-hover: #2563eb;
-
-            --glow-spread: 0px;
-
+            --bg-base: #020617;
+            --bg-mesh: radial-gradient(circle at 60% -20%, #1e1b4b, #020617 60%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-accent: #38bdf8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(15, 23, 42, 0.65);
+            --glass-strong: rgba(2, 6, 23, 0.95);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --header-h: 72px;
+            --radius-lg: 16px;
+            --sidebar-w: 300px;
             --font-ui: 'Inter', sans-serif;
             --font-head: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
-
-            --header-h: 72px;
-            --radius-lg: 16px;
-            --radius-full: 999px;
-            --sidebar-w: 280px;
+            --h1: clamp(2.5rem, 6vw, 5rem);
+            --h2: clamp(2rem, 4vw, 3.2rem);
+            --p: clamp(1rem, 1.5vw, 1.15rem);
+            --ease-elastic: cubic-bezier(0.25, 1, 0.3, 1);
         }
 
-        /* Reset */
         *,
         *::before,
         *::after {
@@ -62,17 +66,94 @@
 
         body {
             margin: 0;
-            background-color: var(--color-bg-base);
-            background-image: var(--color-bg-mesh);
+            background-color: var(--bg-base);
+            background-image: var(--bg-mesh);
             background-attachment: fixed;
-            color: var(--color-text-main);
+            color: var(--text-main);
             font-family: var(--font-ui);
             line-height: 1.6;
             overflow-x: hidden;
+            font-size: var(--p);
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Focus & A11y */
+        :focus-visible {
+            outline: 2px solid var(--text-accent);
+            outline-offset: 4px;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            background: var(--primary);
+            padding: .5rem 1rem;
+            z-index: 2000;
+            color: white;
+            font-weight: 700;
+            transition: top 0.2s;
+        }
+
+        .skip-link:focus {
+            top: 1rem;
+        }
+
         /* Layout */
+        .page-wrap {
+            padding-top: var(--header-h);
+            max-width: 1500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (min-width: 1024px) {
+            .content-grid {
+                display: grid;
+                grid-template-columns: var(--sidebar-w) 1fr;
+                gap: 4rem;
+                padding: 4rem 2rem;
+            }
+
+            .sticky-nav {
+                display: block;
+                position: sticky;
+                top: calc(var(--header-h) + 2rem);
+                height: calc(100vh - var(--header-h) - 4rem);
+                overflow-y: auto;
+                padding-right: 1rem;
+            }
+
+            .mobile-nav-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .content-grid {
+                padding: 2rem 1.5rem;
+            }
+
+            .sticky-nav {
+                position: fixed;
+                top: var(--header-h);
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--bg-base);
+                z-index: 999;
+                padding: 2rem;
+                transform: translateX(100%);
+                transition: transform 0.3s var(--ease-elastic);
+            }
+
+            .sticky-nav[aria-hidden="false"] {
+                transform: translateX(0);
+            }
+        }
+
+        /* Header */
         .site-header {
             position: fixed;
             top: 0;
@@ -82,17 +163,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 2rem;
-            background: var(--color-glass-strong);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--color-border);
+            padding: 0 max(1.5rem, calc((100vw - 1500px)/2));
+            background: var(--glass-strong);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
             z-index: 1000;
         }
 
         .logo {
             font-family: var(--font-head);
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: white;
             text-decoration: none;
             display: flex;
@@ -101,226 +182,101 @@
         }
 
         .logo span {
-            color: var(--color-text-accent);
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            color: var(--text-accent);
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5));
         }
 
-        .btn-cta {
-            padding: 0.6rem 1.4rem;
-            background: var(--color-primary);
-            color: white;
-            font-weight: 600;
-            border-radius: var(--radius-full);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 0 0 transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-cta:hover {
-            background: var(--color-primary-hover);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        /* Page Structure */
-        .page-wrap {
-            padding-top: var(--header-h);
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-        }
-
-        @media (min-width: 1024px) {
-            .content-grid {
-                grid-template-columns: var(--sidebar-w) 1fr;
-                gap: 5rem;
-                padding: 4rem 2rem;
-            }
-        }
-
-        /* Sidebar */
-        .sticky-nav {
-            display: none;
-        }
-
-        @media (min-width: 1024px) {
-            .sticky-nav {
-                display: block;
-                position: sticky;
-                top: calc(var(--header-h) + 2rem);
-                height: calc(100vh - var(--header-h) - 4rem);
-                overflow-y: auto;
-                padding-right: 1rem;
-            }
-        }
-
+        /* Navigation */
         .nav-link {
             display: block;
-            padding: 0.5rem 0;
-            color: var(--color-text-muted);
+            padding: 0.6rem 1rem;
+            color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
             border-left: 2px solid transparent;
-            padding-left: 1rem;
-            margin-bottom: 0.25rem;
             transition: all 0.2s;
-            opacity: 0.7;
+            font-size: 0.95rem;
         }
 
         .nav-link:hover,
         .nav-link.active {
-            color: var(--color-text-accent);
-            border-color: var(--color-text-accent);
-            opacity: 1;
-            padding-left: 1.25rem;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            color: var(--text-accent);
+            border-color: var(--text-accent);
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.08), transparent);
         }
 
         .nav-header {
+            font-family: var(--font-head);
             font-weight: 700;
             color: white;
-            margin: 1.5rem 0 0.5rem;
-            font-family: var(--font-head);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
             opacity: 0.5;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin: 1.5rem 0 0.5rem 1rem;
         }
 
-        /* Typography & Effects */
-        h1 {
+        /* Buttons */
+        .btn-cta {
+            padding: 0.75rem 1.75rem;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s var(--ease-elastic);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+            background: var(--primary-hover);
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            margin-left: 1rem;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3 {
             font-family: var(--font-head);
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            line-height: 1.1;
+            margin-top: 0;
+            color: white;
+        }
+
+        h1 {
+            font-size: var(--h1);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
             margin-bottom: 1.5rem;
-            letter-spacing: -0.02em;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         h2 {
-            font-family: var(--font-head);
-            font-size: clamp(2rem, 3vw, 2.5rem);
-            margin-top: 5rem;
-            margin-bottom: 1.5rem;
-            color: white;
-            scroll-margin-top: 8rem;
+            font-size: var(--h2);
+            margin-top: 6rem;
+            margin-bottom: 2rem;
+            scroll-margin-top: calc(var(--header-h) + 2rem);
         }
 
         h3 {
-            font-family: var(--font-head);
             font-size: 1.5rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: #e2e8f0;
         }
 
         p {
-            color: var(--color-text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
+            color: var(--text-muted);
             max-width: 65ch;
-            leading-relaxed: 1.7;
-        }
-
-        li {
-            color: var(--color-text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        /* SCRAMBLE TEXT EFFECT CLASS */
-        .scramble-text {
-            display: inline-block;
-            min-height: 1.2em;
-            white-space: pre-wrap;
-        }
-
-        /* SPOTLIGHT CARD */
-        .clean-card {
-            /* Glass Base */
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            /* Fallback */
-            border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-
-            /* Spotlight Effect Initials */
-            --mouse-x: -100px;
-            --mouse-y: -100px;
-        }
-
-        /* The spotlight gradient overlay */
-        .clean-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y),
-                    rgba(255, 255, 255, 0.07),
-                    transparent 40%);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        /* Border Spotlight using a pseudo-element mask */
-        .clean-card::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: var(--radius-lg);
-            padding: 1px;
-            /* Border check */
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y),
-                    rgba(56, 189, 248, 0.6),
-                    transparent 40%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .clean-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .clean-card:hover::before,
-        .clean-card:hover::after {
-            opacity: 1;
-        }
-
-        /* Content z-index fix */
-        .clean-card>* {
-            position: relative;
-            z-index: 2;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
+            margin-bottom: 1.5rem;
         }
 
         .tag {
@@ -332,19 +288,103 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-bottom: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tag.blue {
             background: rgba(56, 189, 248, 0.1);
-            color: var(--color-text-accent);
-            border-color: rgba(56, 189, 248, 0.3);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+            color: var(--text-accent);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
         }
 
-        /* 3D Canvas */
+        /* Components */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+            contain: content;
+            /* PERFORMANCE: Limit scope of repaint */
+        }
+
+        .clean-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.1s ease-out;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .clean-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            background: radial-gradient(800px circle at var(--mx, -500px) var(--my, -500px), rgba(255, 255, 255, 0.06), transparent 40%);
+            z-index: 0;
+        }
+
+        .clean-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 1;
+            padding: 1px;
+            border-radius: inherit;
+            background: radial-gradient(600px circle at var(--mx, -500px) var(--my, -500px), rgba(56, 189, 248, 0.5), transparent 40%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .clean-card:hover::before,
+        .clean-card:hover::after {
+            opacity: 1;
+        }
+
+        .clean-card>* {
+            position: relative;
+            z-index: 2;
+            transform: translateZ(20px);
+        }
+
+        ul.stagger-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul.stagger-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s var(--ease-elastic);
+        }
+
+        li.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        ul.stagger-list li::before {
+            content: "•";
+            color: var(--text-accent);
+            position: absolute;
+            left: 0.25rem;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        /* Canvas */
         #canvas-bg {
             position: fixed;
             top: 0;
@@ -353,336 +393,400 @@
             height: 100vh;
             z-index: 0;
             pointer-events: none;
+            transition: opacity 1s;
+            opacity: 0;
+        }
+
+        body.ready #canvas-bg {
             opacity: 1;
-            /* Subtle vignette */
-            mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.1) 100%);
+        }
+
+        @media (max-width: 480px) {
+            #canvas-bg {
+                opacity: 0.5;
+            }
         }
     </style>
-
-    <!-- Three.js + PostProcessing Import Map -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
 </head>
 
 <body>
 
+    <a href="#main" class="skip-link">Skip to Content</a>
     <div id="canvas-bg" aria-hidden="true"></div>
 
     <header class="site-header">
         <a href="#" class="logo"><span>🛡</span> Citadel</a>
-        <a href="mailto:citadel@protonmail.com" class="btn-cta">Request Demo</a>
+        <div style="display:flex; align-items: center; gap: 1rem;">
+            <a href="mailto:citadel@protonmail.com" class="btn-cta">Request Demo</a>
+            <button class="menu-btn mobile-nav-toggle" aria-label="Menu" aria-controls="site-nav"
+                aria-expanded="false">☰</button>
+        </div>
     </header>
 
     <div class="page-wrap">
         <div class="content-grid">
 
-            <!-- Sticky Nav -->
-            <aside class="sticky-nav">
+            <nav id="site-nav" class="sticky-nav" aria-label="Main Navigation" aria-hidden="true">
+                <button class="menu-btn mobile-nav-toggle" style="position:absolute; top:2rem; right:2rem;">✕</button>
                 <div class="nav-header">Overview</div>
                 <a href="#intro" class="nav-link">Welcome</a>
-                <a href="#why" class="nav-link">Why Citadel</a>
-
-                <div class="nav-header">Core Features</div>
-                <a href="#localization" class="nav-link">Data Localization</a>
-                <a href="#degoogling" class="nav-link">Hard De-Googling</a>
-                <a href="#no-ai" class="nav-link">No AI Training</a>
-
+                <a href="#what" class="nav-link">The Mission</a>
+                <a href="#pillars" class="nav-link">Core Pillars</a>
                 <div class="nav-header">Protection</div>
                 <a href="#genai" class="nav-link">GenAI Guardrails</a>
                 <a href="#filtering" class="nav-link">Content Filtering</a>
                 <a href="#dlp" class="nav-link">Last-Mile DLP</a>
                 <a href="#zero-trust" class="nav-link">Zero Trust</a>
+                <div class="nav-header">Platform</div>
+                <a href="#governance" class="nav-link">Governance & Logs</a>
+                <a href="#visibility" class="nav-link">Visibility</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#reality" class="nav-link">Reality Check</a>
+            </nav>
 
-                <div class="nav-header">Governance</div>
-                <a href="#logging" class="nav-link">Forensics & Logs</a>
-                <a href="#extensions" class="nav-link">Extension Control</a>
-
-                <div class="nav-header">Rollout</div>
-                <a href="#reality" class="nav-link">Capabilities</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="main-article">
-
-                <!-- SECTIONS -->
-
-                <section id="intro" class="scroll-trigger"
-                    style="min-height: 80vh; display:flex; flex-direction:column; justify-content:center;">
+            <main id="main">
+                <section id="intro" class="scroll-trigger" aria-labelledby="h-intro"
+                    style="min-height: 85vh; display:flex; flex-direction:column; justify-content:center;">
                     <div>
-                        <span class="tag blue">Enterprise Browser</span>
-                        <h1 class="scramble-trigger">The privatized browser that keeps company data inside your walls.
-                        </h1>
-                        <p class="lead" style="font-size:1.25rem; color:#cbd5e1;">
+                        <span class="tag">Enterprise Browser</span>
+                        <h1 id="h-intro" class="scramble-trigger">The privatized browser that keeps company data inside
+                            your walls.</h1>
+                        <p class="lead" style="font-size:1.35rem; color:#cbd5e1; margin-bottom: 2.5rem;">
                             Citadel is a security-first, de-Googled Chromium browser built for organizations that need
-                            real control, real auditability, and real data boundaries.
+                            <strong>real control</strong>, <strong>real auditability</strong>, and <strong>real data
+                                boundaries</strong>.
                         </p>
-                        <div style="margin-top: 2rem; display:flex; gap:1rem;">
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
                             <a href="mailto:citadel@protonmail.com" class="btn-cta"
-                                style="padding: 1rem 2rem; font-size:1rem;">Request a Demo</a>
+                                style="padding:1rem 2.5rem; font-size:1.1rem;">Request Demo</a>
+                            <a href="#what"
+                                style="padding:1rem 2rem; border-radius:99px; border:1px solid rgba(255,255,255,0.2); color:white; text-decoration:none; font-weight:600;">Learn
+                                More</a>
+                        </div>
+                    </div>
+                </section>
+                <hr style="border:0; border-top:1px solid var(--border); margin: 0 0 5rem;">
+
+                <section id="what" class="scroll-trigger" aria-labelledby="h-what">
+                    <h2 id="h-what" class="scramble-trigger">Why Citadel exists</h2>
+                    <p>Most “enterprise browser” promises collapse at two moments:</p>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>Security asks:</h3>
+                            <p style="font-size:1.2rem; color:white;">“Where does the data actually go?”</p>
+                            <p class="text-sm">If your browser sends every URL to a SaaS cloud for "analysis", you've
+                                just created the world's largest leak.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Employees ask:</h3>
+                            <p style="font-size:1.2rem; color:white;">“Are you recording my whole life?”</p>
+                            <p class="text-sm">Privacy-hostile agents destroy culture. Citadel balances strict control
+                                with transparency.</p>
                         </div>
                     </div>
                 </section>
 
-                <section id="why" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Why Citadel exists</h2>
-                    <p>Most “enterprise browser” stories fall apart at the same two moments:</p>
+                <section id="pillars" class="scroll-trigger" aria-labelledby="h-pillars">
+                    <h2 id="h-pillars" class="scramble-trigger">Core Pillars</h2>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>1. Full Data Localization</h3>
+                            <p>Telemetry, logs, and policy config stay <strong>inside your infrastructure</strong>.</p>
+                            <ul class="stagger-list">
+                                <li>No mandatory calls to vendor clouds</li>
+                                <li>Customer-defined retention (30/90 days)</li>
+                                <li>Role-based visibility</li>
+                            </ul>
+                        </div>
+                        <div class="clean-card">
+                            <h3>2. Hard De-Googling</h3>
+                            <p>Eliminate “invisible dependencies” that create compliance ambiguity.</p>
+                            <ul class="stagger-list">
+                                <li>Removed Chrome Sync & Suggestions</li>
+                                <li>Disabled "Safe Browsing" pings</li>
+                                <li>Cleaner threat model</li>
+                            </ul>
+                        </div>
+                        <div class="clean-card">
+                            <h3>3. No AI Training</h3>
+                            <p><strong>Your page content never leaves your tenant to train external models.</strong></p>
+                            <ul class="stagger-list">
+                                <li>Technical egress controls</li>
+                                <li>Contractual guarantees</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="genai" class="scroll-trigger" aria-labelledby="h-genai">
+                    <h2 id="h-genai" class="scramble-trigger">GenAI Guardrails</h2>
+                    <p>AI is a primary exfiltration path. Citadel treats it that way.</p>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>Prompt Control</h3>
+                            <p>Detect and control prompts going into GenAI tools.</p>
+                            <ul class="stagger-list">
+                                <li>Redact sensitive PII/Secrets in flight</li>
+                                <li>Block risky prompt patterns</li>
+                                <li>Role-based policies for Legal vs Eng</li>
+                            </ul>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Extension Kill-Switch</h3>
+                            <p>Global allowlist for AI & automation extensions.</p>
+                            <ul class="stagger-list">
+                                <li>Auto-quarantine risky tools</li>
+                                <li>No "user disable" loopholes</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="filtering" class="scroll-trigger" aria-labelledby="h-filtering">
+                    <h2 id="h-filtering" class="scramble-trigger">Content Filtering</h2>
+                    <p>Enforce policy where browsing actually happens—not just at DNS.</p>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>Enterprise Categories</h3>
+                            <p>Block NSFW, Gambling, Piracy, and Malware domains granularly by user group.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Safe Search Lock</h3>
+                            <p>Force Safe Search modes on major search platforms. Prevent user overrides.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Contextual NSFW</h3>
+                            <p>ML-based explicit content detection (images/text) on the page itself.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="dlp" class="scroll-trigger" aria-labelledby="h-dlp">
+                    <h2 id="h-dlp" class="scramble-trigger">Last-Mile DLP</h2>
+                    <p>Stop leases at the final second: copy, paste, upload, download.</p>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>SaaS-Aware Controls</h3>
+                            <p>Allow paste into Salesforce, block paste into ChatGPT. Security that fits workflows.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Clipboard Zoning</h3>
+                            <p>Separate "Work" vs "Personal" clipboards to prevent accidental cross-context leakage.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Personal Cloud Block</h3>
+                            <p>Restrict uploads to personal Drive/Dropbox while allowing corporate buckets.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="zero-trust" class="scroll-trigger" aria-labelledby="h-zt">
+                    <h2 id="h-zt" class="scramble-trigger">Zero Trust Access</h2>
                     <div class="clean-card">
-                        <ul style="margin:0; padding-left:1.5rem;">
-                            <li>When security asks, <strong style="color:white">“Where does the data actually
-                                    go?”</strong></li>
-                            <li>When employees ask, <strong style="color:white">“Are you recording my whole
-                                    life?”</strong></li>
+                        <p style="font-style:italic; font-size:1.2rem; color:white; margin-bottom:1rem;">
+                            “Finance apps only from corporate network on compliant, encrypted laptops.”
+                        </p>
+                        <ul class="stagger-list">
+                            <li><strong>Posture Checks:</strong> Verify OS patch, Disk Encryption, EDR presence.</li>
+                            <li><strong>Identity Isolation:</strong> Strict separation of work/personal cookies.</li>
+                            <li><strong>SSO Enforced:</strong> Force sanctioned SaaS through SAML/OIDC.</li>
                         </ul>
                     </div>
                 </section>
 
-                <section id="localization" class="scroll-trigger">
-                    <h2 class="scramble-trigger">What makes Citadel different</h2>
+                <section id="governance" class="scroll-trigger" aria-labelledby="h-gov">
+                    <h2 id="h-gov" class="scramble-trigger">Governance & Logs</h2>
+                    <p>Get incident-grade evidence without turning the browser into chaos.</p>
                     <div class="feature-grid">
                         <div class="clean-card">
-                            <h3>Full data localization</h3>
-                            <p>Telemetry, browsing history, and logs stored <strong>only on customer
-                                    infrastructure</strong>.</p>
+                            <h3>Logging</h3>
+                            <p>URLs, uploads, policy hits, extension activity. Streamed as JSON to your SIEM.</p>
                         </div>
-                        <div class="clean-card" id="degoogling">
-                            <h3>Hard De-Googling</h3>
-                            <p>No hidden "Safe Browsing" pings. No sync services. Fewer compliance headaches.</p>
+                        <div class="clean-card">
+                            <h3>Extension Store</h3>
+                            <p>Managed extension inventory. Auto-removal of disallowed tools. Runtime sandboxing.</p>
                         </div>
                     </div>
                 </section>
 
-                <section id="no-ai" class="scroll-trigger">
-                    <div class="clean-card"
-                        style="border:1px solid var(--color-text-accent); background: rgba(56, 189, 248, 0.05);">
-                        <h3 style="color: var(--color-text-accent)">Strict “No AI training” guarantee</h3>
-                        <p><strong>Your page content and prompts do not leave your tenant used to train external
-                                models.</strong></p>
-                    </div>
-                </section>
-
-                <section id="genai" class="scroll-trigger">
-                    <h2 class="scramble-trigger">GenAI Guardrails</h2>
-                    <p>Detect and control prompts going into GenAI tools. Block sensitive PII before it reaches the
-                        model.</p>
+                <section id="visibility" class="scroll-trigger" aria-labelledby="h-vis">
+                    <h2 id="h-vis" class="scramble-trigger">Visibility</h2>
                     <div class="clean-card">
-                        <h3>Extension Kill-Switch</h3>
-                        <p>Automatic detection and quarantine of risky GenAI extensions that read page content.</p>
+                        <h3>Shadow IT Discovery</h3>
+                        <p>See what the business is actually using. Inventory of accessed web apps by department.</p>
                     </div>
                 </section>
 
-                <section id="filtering" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Content Filtering</h2>
-                    <p>Enforce policies where browsing happens. Block NSFW, Gambling, and Malware at the browser layer,
-                        not just DNS.</p>
-                </section>
-
-                <section id="dlp" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Last-Mile DLP</h2>
-                    <p>Stop the "Copy/Paste" leak. SaaS-aware rules that allow work apps but block personal email.</p>
-                    <div class="clean-card">
-                        <h3>Personal Cloud Block</h3>
-                        <p>Watermark or block uploads to personal Drive/Dropbox.</p>
+                <section id="architecture" class="scroll-trigger" aria-labelledby="h-arch">
+                    <h2 id="h-arch" class="scramble-trigger">Architecture</h2>
+                    <p><strong>Control plane and data plane belong to you.</strong></p>
+                    <div class="feature-grid">
+                        <div class="clean-card">
+                            <h3>Policy Controller</h3>
+                            <p>Customer-hosted enforcement config.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Event Pipeline</h3>
+                            <p>Customer-hosted storage + forwarding.</p>
+                        </div>
+                        <div class="clean-card">
+                            <h3>Private LLM Connector</h3>
+                            <p>Routes in-browser GenAI to your private endpoint.</p>
+                        </div>
                     </div>
                 </section>
 
-                <section id="zero-trust" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Zero Trust Access</h2>
-                    <p><em>“Finance apps only from corporate network on compliant laptops.”</em></p>
-                    <p>Verify OS patch level and EDR status before granting access.</p>
-                </section>
-
-                <section id="logging" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Logging & Forensics</h2>
-                    <p>Always-on session logging (URL, Uploads, Blocks) streamed directly to your SIEM/SOAR as JSON.</p>
-                </section>
-
-                <section id="extensions" class="scroll-trigger">
-                    <h2 class="scramble-trigger">Extension Governance</h2>
-                    <p>Managed store only. Runtime sandboxing to limit extension API access.</p>
-                </section>
-
-                <section id="reality" class="scroll-trigger">
-                    <h2 class="scramble-trigger">The Reality Check</h2>
-                    <p>Citadel is powerful, but not magic. We can't stop a phone camera. But we raise the cost of bypass
-                        significantly.</p>
-                </section>
-
-                <section id="faq" class="scroll-trigger">
-                    <h2 class="scramble-trigger">FAQ</h2>
-                    <div class="clean-card">
-                        <p><strong>Is this just Chrome?</strong> No, it's a hardened, de-Googled build.</p>
-                        <p><strong>Does it phone home?</strong> No, full localization.</p>
-                    </div>
-                    <div style="margin-top:5rem; margin-bottom: 5rem; text-align:center;">
-                        <h2>Get Started</h2>
-                        <a href="mailto:citadel@protonmail.com" class="btn-cta"
-                            style="padding:1rem 2.5rem; font-size:1.1rem;">Contact Sales</a>
-                        <p style="margin-top:1rem; font-family:var(--font-mono);">citadel@protonmail.com</p>
+                <section id="reality" class="scroll-trigger" aria-labelledby="h-reality" style="margin-bottom: 5rem;">
+                    <h2 id="h-reality" class="scramble-trigger">The Reality Check</h2>
+                    <div class="clean-card" style="border-left: 4px solid var(--primary);">
+                        <p>Citadel <strong>can</strong> dramatically reduce browser-based leakage and provide
+                            high-quality evidence.</p>
+                        <p>Citadel <strong>cannot</strong> stop a phone camera, a second device, or a malicious insider
+                            who writes things down.</p>
+                        <p><strong>Success = Right-sized logging + Staged blocking + Fast exceptions.</strong></p>
                     </div>
                 </section>
 
+                <footer style="text-align:center; padding: 4rem 0;">
+                    <h2 class="scramble-trigger">Get Started</h2>
+                    <p>Deploy a browser that treats corporate data like corporate data.</p>
+                    <br>
+                    <a href="mailto:citadel@protonmail.com" class="btn-cta">Request Demo</a>
+                    <p style="margin-top:2rem; font-family:var(--font-mono); color: var(--primary);">
+                        citadel@protonmail.com</p>
+                </footer>
             </main>
         </div>
     </div>
 
     <!-- 
-     * =========================================
-     *  SCRIPTS: Ultimate Polish
-     *  (Bloom, Spotlight, Scramble, 3D Morph)
-     * =========================================
+     * SCRIPTS: Production Build
      -->
 
-    <!-- 1. Spotlight UI -->
+    <!-- UI & Interaction -->
     <script>
+        // --- MOBILE NAV ---
+        const toggle = document.querySelector('.mobile-nav-toggle');
+        const nav = document.getElementById('site-nav');
+
+        let isNavOpen = false;
+        const setNav = (open) => {
+            isNavOpen = open;
+            nav.setAttribute('aria-hidden', !open);
+            document.body.style.overflow = open ? 'hidden' : '';
+        };
+        document.querySelectorAll('.mobile-nav-toggle').forEach(btn => btn.addEventListener('click', () => setNav(!isNavOpen)));
+        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => { if (window.innerWidth < 1024) setNav(false); }));
+
+        // --- GLASS TILT ---
+        const cards = document.querySelectorAll('.clean-card');
         document.addEventListener('mousemove', (e) => {
-            const cards = document.querySelectorAll('.clean-card');
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', `${x}px`);
-                card.style.setProperty('--mouse-y', `${y}px`);
+            if (window.innerWidth < 1024) return;
+            requestAnimationFrame(() => {
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mx', `${x}px`);
+                    card.style.setProperty('--my', `${y}px`);
+
+                    if (x > -50 && x < rect.width + 50 && y > -50 && y < rect.height + 50) {
+                        const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -2;
+                        const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 2;
+                        card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.01, 1.01, 1.01)`;
+                    } else {
+                        card.style.transform = 'none';
+                    }
+                });
             });
         });
-    </script>
 
-    <!-- 2. Cyber Scramble Text -->
-    <script>
-        class TextScramble {
-            constructor(el) {
-                this.el = el;
-                this.chars = '!<>-_\\/[]{}—=+*^?#________';
-                this.update = this.update.bind(this);
-            }
-            setText(newText) {
-                const oldText = this.el.innerText;
-                const length = Math.max(oldText.length, newText.length);
-                const promise = new Promise((resolve) => this.resolve = resolve);
-                this.queue = [];
-                for (let i = 0; i < length; i++) {
-                    const from = oldText[i] || '';
-                    const to = newText[i] || '';
-                    const start = Math.floor(Math.random() * 40);
-                    const end = start + Math.floor(Math.random() * 40);
-                    this.queue.push({ from, to, start, end });
-                }
-                cancelAnimationFrame(this.frameRequest);
-                this.frame = 0;
-                this.update();
-                return promise;
-            }
-            update() {
-                let output = '';
-                let complete = 0;
-                for (let i = 0, n = this.queue.length; i < n; i++) {
-                    let { from, to, start, end, char } = this.queue[i];
-                    if (this.frame >= end) {
-                        complete++;
-                        output += to;
-                    } else if (this.frame >= start) {
-                        if (!char || Math.random() < 0.28) {
-                            char = this.randomChar();
-                            this.queue[i].char = char;
-                        }
-                        output += `<span style="color:var(--color-primary); opacity:0.7;">${char}</span>`;
-                    } else {
-                        output += from;
-                    }
-                }
-                this.el.innerHTML = output;
-                if (complete === this.queue.length) {
-                    this.resolve();
-                } else {
-                    this.frameRequest = requestAnimationFrame(this.update);
-                    this.frame++;
-                }
-            }
-            randomChar() {
-                return this.chars[Math.floor(Math.random() * this.chars.length)];
-            }
-        }
-
+        // --- SCRAMBLE TEXT ---
         const scrambleObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.classList.contains('scrambled-done')) {
+                if (entry.isIntersecting && !entry.target.classList.contains('done')) {
                     const el = entry.target;
                     const text = el.innerText;
-                    const fx = new TextScramble(el);
-                    fx.setText(text);
-                    el.classList.add('scrambled-done');
+                    const chars = '!<>-_\\/[]{}—=+*^?#________';
+                    let iter = 0;
+                    const fx = setInterval(() => {
+                        el.innerText = text.split("").map((c, i) => i < iter ? text[i] : chars[Math.floor(Math.random() * chars.length)]).join("");
+                        if (iter >= text.length) { clearInterval(fx); el.classList.add('done'); }
+                        iter += 1 / 3;
+                    }, 30);
+                    scrambleObserver.unobserve(el);
                 }
             });
         }, { threshold: 0.5 });
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('.scramble-trigger').forEach(el => scrambleObserver.observe(el));
+        }
 
-        document.querySelectorAll('.scramble-trigger').forEach(el => scrambleObserver.observe(el));
+        // --- STAGGER LIST ---
+        const listObserver = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.querySelectorAll('li').forEach((li, i) => setTimeout(() => li.classList.add('reveal'), i * 80));
+                    listObserver.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.stagger-list').forEach(l => listObserver.observe(l));
     </script>
 
-    <!-- 3. Ultimate 3D Engine -->
+    <!-- 3D LOGIC (Robust) -->
     <script type="module">
         import * as THREE from 'three';
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // Check reduced motion
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!prefersReducedMotion) initEngine();
+        const IS_MOBILE = window.innerWidth < 768;
+        const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        function initEngine() {
+        if (!REDUCED_MOTION) {
+            try { initThree(); } catch (e) { console.warn("WebGL Init Failed, fallback to CSS", e); }
+        }
+
+        function initThree() {
             const container = document.getElementById('canvas-bg');
+            if (!container) return;
+
             const scene = new THREE.Scene();
-            // Deep fog to blend particles into the void
             scene.fog = new THREE.FogExp2(0x020617, 0.035);
 
             const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.set(0, 0, 16);
+            camera.position.set(0, 0, 20);
 
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Cap pixel ratio for Bloom perf
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             container.appendChild(renderer.domElement);
 
-            // POST-PROCESSING (The "Eye Candy")
-            const renderScene = new RenderPass(scene, camera);
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.6, 0.5, 0.1);
-            // Strength, Radius, Threshold
+            let composer;
+            if (!IS_MOBILE) {
+                const renderScene = new RenderPass(scene, camera);
+                const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.5, 0.1);
+                composer = new EffectComposer(renderer);
+                composer.addPass(renderScene);
+                composer.addPass(bloomPass);
+            }
 
-            const composer = new EffectComposer(renderer);
-            composer.addPass(renderScene);
-            composer.addPass(bloomPass);
-
-            // ----------------------------------------------------------------
-            // PARTICLES
-            // ----------------------------------------------------------------
-            const count = 4000; // Increased count
+            // --- PARTICLES ---
+            const count = IS_MOBILE ? 1500 : 4500;
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(count * 3);
             const targets = new Float32Array(count * 3);
-            const randoms = new Float32Array(count);
             const sizes = new Float32Array(count);
+            const randoms = new Float32Array(count);
 
             for (let i = 0; i < count; i++) {
-                // Initial: Big Bang Center
                 positions[i * 3] = (Math.random() - 0.5) * 0.5;
                 positions[i * 3 + 1] = (Math.random() - 0.5) * 0.5;
                 positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
-
-                // Targets: defaults
-                targets[i * 3] = (Math.random() - 0.5) * 10;
-                targets[i * 3 + 1] = (Math.random() - 0.5) * 10;
-                targets[i * 3 + 2] = (Math.random() - 0.5) * 10;
-
                 randoms[i] = Math.random();
                 sizes[i] = Math.random();
             }
-
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
             geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
@@ -691,195 +795,127 @@
                 uniforms: {
                     uTime: { value: 0 },
                     uColor: { value: new THREE.Color(0x38bdf8) },
-                    uMoodSpeed: { value: 1.0 },
-                    uMoodTurbulence: { value: 0.2 },
                 },
                 vertexShader: `
-                    uniform float uTime;
-                    uniform float uMoodSpeed;
-                    uniform float uMoodTurbulence;
-                    attribute float aRandom;
-                    attribute float aSize;
-                    varying float vAlpha;
-                    
+                    uniform float uTime; attribute float aRandom; attribute float aSize; varying float vAlpha;
                     void main() {
-                        vec3 pos = position; 
-                        
-                        // Noise/Flow
-                        float noise = sin(uTime * uMoodSpeed + pos.x) * cos(uTime * uMoodSpeed * 0.8 + pos.y);
-                        pos += noise * uMoodTurbulence;
-                        
-                        // Drift
+                        vec3 pos = position;
                         pos.y += sin(uTime * 0.5 + aRandom * 10.0) * 0.1;
-
+                        pos.x += cos(uTime * 0.3 + aRandom * 10.0) * 0.1;
                         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                        // Size modulated by Bloom requirements (slightly larger)
-                        gl_PointSize = (5.0 * aSize + 2.0) * (20.0 / -mvPosition.z);
+                        gl_PointSize = (4.0 * aSize + 2.0) * (20.0 / -mvPosition.z);
                         gl_Position = projectionMatrix * mvPosition;
-                        
-                        vAlpha = 0.5 + 0.5 * sin(uTime * 2.0 + aRandom * 15.0);
+                        vAlpha = 0.5 + 0.5 * sin(uTime + aRandom * 20.0);
                     }
                 `,
                 fragmentShader: `
-                    uniform vec3 uColor;
-                    varying float vAlpha;
+                    uniform vec3 uColor; varying float vAlpha;
                     void main() {
-                        // Soft circle
-                        float r = distance(gl_PointCoord, vec2(0.5));
-                        if(r > 0.5) discard;
-                        
-                        // Glow core
-                        float strength = 1.0 - (r * 2.0);
-                        strength = pow(strength, 1.5);
-
-                        gl_FragColor = vec4(uColor, vAlpha * strength);
+                        if (length(gl_PointCoord - vec2(0.5)) > 0.5) discard;
+                        gl_FragColor = vec4(uColor, vAlpha * 0.85);
                     }
                 `,
                 transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
             });
-
             const particles = new THREE.Points(geometry, material);
             scene.add(particles);
 
-            // ----------------------------------------------------------------
-            // MORPH SHAPES
-            // ----------------------------------------------------------------
+            // --- SCROLL & MORPH ---
             const shapes = {
-                sphere: (i) => {
-                    const r = 6;
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.acos(2 * Math.random() - 1);
+                sphere: () => {
+                    const r = 6; const theta = Math.random() * Math.PI * 2; const phi = Math.acos(2 * Math.random() - 1);
                     return { x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi) };
                 },
-                box: (i) => {
-                    const s = 8;
-                    return { x: (Math.random() - 0.5) * s, y: (Math.random() - 0.5) * s, z: (Math.random() - 0.5) * s };
+                network: (i) => {
+                    const r = 4 + Math.random() * 12; const theta = Math.random() * Math.PI * 2;
+                    if (i < count * 0.2) return { x: 0, y: 0, z: 0 };
+                    return { x: r * Math.cos(theta), y: (Math.random() - 0.5) * 3, z: r * Math.sin(theta) };
                 },
-                shield: (i) => {
-                    const r = 6;
-                    const theta = Math.random() * Math.PI * 2;
-                    const phi = Math.random() * Math.PI * 0.5; // Top half
+                grid: () => ({ x: (Math.random() - 0.5) * 40, y: -6, z: (Math.random() - 0.5) * 40 }),
+                shield: () => {
+                    const r = 6; const theta = Math.random() * Math.PI * 2; const phi = Math.random() * Math.PI * 0.5;
                     return { x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi) };
                 },
-                stream: (i) => {
-                    return { x: (Math.random() - 0.5) * 4, y: (Math.random() - 0.5) * 18, z: (Math.random() - 0.5) * 4 };
-                },
-                ring: (i) => {
-                    const r = 5 + Math.random() * 2;
-                    const theta = Math.random() * Math.PI * 2;
-                    return { x: r * Math.cos(theta), y: (Math.random() - 0.5) * 1, z: r * Math.sin(theta) };
-                }
+                stream: () => ({ x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 20, z: (Math.random() - 0.5) * 5 })
             };
 
-            // Interpolation Vars
-            let colorTarget = new THREE.Color(0x38bdf8);
-            let speedTarget = 1.0;
-            let turbTarget = 0.2;
-            let bigBangTriggered = false;
+            const map = {
+                'intro': { s: 'sphere', c: 0x38bdf8, z: 20 }, 'what': { s: 'network', c: 0x818cf8, z: 25 },
+                'pillars': { s: 'stream', c: 0x38bdf8, z: 20 }, 'genai': { s: 'shield', c: 0xf472b6, z: 18 },
+                'filtering': { s: 'grid', c: 0xf87171, z: 30 }, 'dlp': { s: 'stream', c: 0xfbbf24, z: 15 },
+                'zero-trust': { s: 'shield', c: 0x38bdf8, z: 18 }, 'governance': { s: 'network', c: 0xc084fc, z: 25 },
+                'visibility': { s: 'sphere', c: 0x34d399, z: 22 }, 'architecture': { s: 'network', c: 0x38bdf8, z: 28 }
+            };
 
-            function updateTarget(shapeName, colorHex, speed, turb) {
-                const gen = shapes[shapeName] || shapes.sphere;
+            function setShape(key) {
+                const gen = shapes[key] || shapes.sphere;
                 for (let i = 0; i < count; i++) {
                     const p = gen(i);
                     targets[i * 3] = p.x; targets[i * 3 + 1] = p.y; targets[i * 3 + 2] = p.z;
                 }
-                colorTarget.setHex(colorHex);
-                speedTarget = speed;
-                turbTarget = turb;
             }
+            setShape('sphere');
 
-            // Big Bang Init
-            updateTarget('sphere', 0x38bdf8, 1.0, 0.2);
+            let colorTarget = new THREE.Color(0x38bdf8);
+            let cameraZTarget = 20;
 
-            // ----------------------------------------------------------------
-            // SCROLL OBSERVER
-            // ----------------------------------------------------------------
-            const sectionConfigs = {
-                'intro': { shape: 'sphere', color: 0x38bdf8, speed: 1.0, turb: 0.2 },
-                'why': { shape: 'box', color: 0x818cf8, speed: 1.8, turb: 0.3 },
-                'localization': { shape: 'stream', color: 0x38bdf8, speed: 2.2, turb: 0.4 },
-                'no-ai': { shape: 'shield', color: 0x34d399, speed: 0.5, turb: 0.15 },
-                'genai': { shape: 'sphere', color: 0xf472b6, speed: 3.5, turb: 0.7 },
-                'filtering': { shape: 'ring', color: 0xf87171, speed: 2.0, turb: 0.3 },
-                'dlp': { shape: 'stream', color: 0xfbbf24, speed: 1.2, turb: 0.1 },
-                'zero-trust': { shape: 'shield', color: 0x38bdf8, speed: 0.5, turb: 0.1 },
-                'logging': { shape: 'stream', color: 0xc084fc, speed: 1.5, turb: 0.2 },
-                'extensions': { shape: 'box', color: 0x94a3b8, speed: 0.5, turb: 0.1 },
-                'faq': { shape: 'sphere', color: 0x38bdf8, speed: 1.0, turb: 0.2 }
-            };
-
-            const io = new IntersectionObserver((entries) => {
+            const observer = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     if (e.isIntersecting) {
                         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                        const navLink = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
-                        if (navLink) navLink.classList.add('active');
+                        const link = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+                        if (link) link.classList.add('active');
 
-                        const cfg = sectionConfigs[e.target.id];
-                        if (cfg) updateTarget(cfg.shape, cfg.color, cfg.speed, cfg.turb);
+                        const cfg = map[e.target.id];
+                        if (cfg) { setShape(cfg.s); colorTarget.setHex(cfg.c); cameraZTarget = cfg.z; }
                     }
                 });
             }, { threshold: 0.25 });
-            document.querySelectorAll('.scroll-trigger').forEach(s => io.observe(s));
+            document.querySelectorAll('.scroll-trigger').forEach(s => observer.observe(s));
 
-            // ----------------------------------------------------------------
-            // ANIM LOOP
-            // ----------------------------------------------------------------
+            // --- LOOP ---
+            let bang = 0;
             const clock = new THREE.Clock();
+            document.body.classList.add('ready');
 
-            // Explosive expansion logic
-            let bangPhase = 0; // 0=start, 1=explode, 2=settle
+            // VISIBILITY API: BATTERY SAVER
+            let isVisible = true;
+            document.addEventListener('visibilitychange', () => { isVisible = !document.hidden; });
 
             function animate() {
                 requestAnimationFrame(animate);
+                if (!isVisible) return;
+
                 const dt = clock.getDelta();
                 const time = clock.getElapsedTime();
 
-                // Big Bang Sequence
-                if (bangPhase === 0 && time > 0.1) bangPhase = 1;
+                // Bang
+                if (bang === 0 && time > 0.1) bang = 1;
 
-                // Uniform Lerps
                 material.uniforms.uTime.value = time;
                 material.uniforms.uColor.value.lerp(colorTarget, dt * 1.5);
-                material.uniforms.uMoodSpeed.value += (speedTarget - material.uniforms.uMoodSpeed.value) * dt;
-                material.uniforms.uMoodTurbulence.value += (turbTarget - material.uniforms.uMoodTurbulence.value) * dt;
+                camera.position.z += (cameraZTarget - camera.position.z) * dt * 0.8;
+                camera.lookAt(0, 0, 0);
 
                 const pos = geometry.attributes.position.array;
-
-                if (bangPhase === 1) {
-                    // Explode outward
-                    for (let i = 0; i < count; i++) {
-                        const ix = i * 3;
-                        pos[ix] += (pos[ix] * 10 - pos[ix]) * dt * 5.0; // Rapid expansion
-                        pos[ix + 1] += (pos[ix + 1] * 10 - pos[ix + 1]) * dt * 5.0;
-                        pos[ix + 2] += (pos[ix + 2] * 10 - pos[ix + 2]) * dt * 5.0;
-                    }
-                    if (time > 0.5) bangPhase = 2; // Switch to morphing
-                } else if (bangPhase === 2) {
-                    // Standard Morphing
-                    for (let i = 0; i < count; i++) {
-                        const ix = i * 3;
-                        pos[ix] += (targets[ix] - pos[ix]) * dt * 2.5;
-                        pos[ix + 1] += (targets[ix + 1] - pos[ix + 1]) * dt * 2.5;
-                        pos[ix + 2] += (targets[ix + 2] - pos[ix + 2]) * dt * 2.5;
-                    }
+                if (bang === 1) {
+                    for (let i = 0; i < count * 3; i++) pos[i] += (pos[i] * 15 - pos[i]) * dt * 3.0; // Explode
+                    if (time > 0.8) bang = 2;
+                } else if (bang === 2) {
+                    for (let i = 0; i < count * 3; i++) pos[i] += (targets[i] - pos[i]) * dt * 2.5; // Morph
                 }
-
                 geometry.attributes.position.needsUpdate = true;
+                scene.rotation.y = time * 0.05;
 
-                scene.rotation.y = time * 0.08;
-
-                // Render with Bloom
-                composer.render();
+                if (composer) composer.render(); else renderer.render(scene, camera);
             }
             animate();
 
-            // Resize
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-                composer.setSize(window.innerWidth, window.innerHeight);
+                if (composer) composer.setSize(window.innerWidth, window.innerHeight);
             });
         }
     </script>
